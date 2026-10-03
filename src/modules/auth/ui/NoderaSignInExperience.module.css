@@ -1,0 +1,26 @@
+.root { background: #050b1d; color: #f6f8ff; min-height: 100dvh; overflow: hidden; position: relative; }
+.stage { inset: 0; min-height: 100dvh; overflow: hidden; position: absolute; transition: opacity 650ms cubic-bezier(0.22, 1, 0.36, 1), transform 650ms cubic-bezier(0.22, 1, 0.36, 1); }
+.stageVisible { opacity: 1; transform: scale(1); z-index: 2; }
+.stageHidden { opacity: 0; pointer-events: none; transform: scale(1.015); z-index: 1; }
+.backgroundImage { object-fit: cover; object-position: center; z-index: -3; }
+.backgroundShade { background: linear-gradient(90deg, rgba(2, 7, 21, 0.05), rgba(2, 7, 21, 0.2) 43%, rgba(2, 7, 21, 0.62)), linear-gradient(0deg, rgba(2, 7, 21, 0.45), transparent 55%); inset: 0; position: absolute; z-index: -2; }
+.welcomeStage { align-items: center; background: radial-gradient(circle at 50% 42%, #152a5c 0%, #08132e 52%, #030816 100%); display: flex; justify-content: center; }
+.welcomeGlass { align-items: center; display: flex; justify-content: center; padding: 24px clamp(28px, 6vw, 96px); }
+.signInStage { align-items: center; display: flex; justify-content: flex-end; padding: clamp(18px, 3vw, 44px); }
+.formGlass { align-items: center; background: linear-gradient(110deg, rgba(11, 24, 58, 0.35), rgba(9, 18, 43, 0.8)); border: 1px solid rgba(158, 186, 255, 0.18); border-radius: 30px; box-shadow: -24px 0 80px rgba(0, 4, 18, 0.24), inset 1px 0 0 rgba(255, 255, 255, 0.08); display: flex; justify-content: center; min-height: min(720px, calc(100dvh - 96px)); padding: clamp(28px, 5vw, 72px); width: min(43vw, 600px); -webkit-backdrop-filter: blur(26px) saturate(125%); backdrop-filter: blur(26px) saturate(125%); }
+.formInner { max-width: 380px; width: 100%; }
+.brandLockup { align-items: center; color: #edf3ff; display: inline-flex; font-size: 20px; font-weight: 760; gap: 10px; letter-spacing: -0.04em; }
+.brandMark { display: inline-flex; gap: 2px; transform: rotate(-28deg); }
+.brandMark i { background: #7c9cff; display: block; height: 14px; width: 4px; }
+.brandMark i:nth-child(2) { background: #b5c8ff; height: 19px; }
+.brandMark i:nth-child(3) { background: #536ec8; height: 10px; }
+.formCopy { margin: clamp(54px, 9vh, 108px) 0 30px; }
+.kicker { color: #aebfff; font-family: "Avenir Next", "Segoe UI", sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 0.17em; margin: 0 0 16px; }
+.formCopy h1 { color: #f7f9ff; font-family: "Avenir Next", "Segoe UI", sans-serif; font-size: clamp(34px, 3.4vw, 52px); font-weight: 720; letter-spacing: -0.065em; line-height: 0.98; margin: 0; }
+.formCopy p { color: #c3cce4; font-size: 15px; line-height: 1.65; margin: 23px 0 0; max-width: 310px; }
+.googleAction :global(.MuiButton-root) { background: #e8efff; border: 1px solid rgba(232, 239, 255, 0.92); border-radius: 9px; box-shadow: none; color: #0b193c; min-height: 54px; padding-inline: 20px; transition: background-color 160ms ease, transform 160ms ease; }
+.googleAction :global(.MuiButton-root:hover) { background: #ffffff; box-shadow: none; transform: translateY(-1px); }
+.googleAction :global(.MuiButton-root:focus-visible) { outline: 3px solid #7a9cf6; outline-offset: 3px; }
+.googleAction :global(.MuiButton-startIcon) { margin-right: 10px; }
+@media (max-width: 760px) { .backgroundImage { object-position: 28% center; } .backgroundShade { background: linear-gradient(180deg, rgba(2, 7, 21, 0.2), rgba(2, 7, 21, 0.78) 68%, rgba(2, 7, 21, 0.94)); } .welcomeGlass { padding: 20px; width: calc(100% - 40px); } .signInStage { padding: 14px; } .formGlass { border-radius: 24px; min-height: min(600px, calc(100dvh - 96px)); padding: 32px 26px; width: 100%; } .formCopy { margin: 48px 0 30px; } }
+@media (prefers-reduced-motion: reduce) { .stage, .googleAction :global(.MuiButton-root) { transition: none; } }
