@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import { requestId } from "hono/request-id";
+import { analyticsRoutes } from "@/modules/analytics/api/analytics.routes";
 import { campaignsRoutes } from "@/modules/campaigns/api/campaigns.routes";
 import { followUpsRoutes } from "@/modules/followups/api/followups.routes";
 import { interactionsRoutes } from "@/modules/interactions/api/interactions.routes";
@@ -31,6 +32,7 @@ api.route("/followups", followUpsRoutes);
 api.route("/campaigns", campaignsRoutes);
 api.route("/prospects", prospectsRoutes);
 api.route("/routes", routesRoutes);
+api.route("/analytics", analyticsRoutes);
 
 api.onError(handleApiError);
 api.notFound(handleApiNotFound);
