@@ -1,0 +1,51 @@
+/**
+ * Stable, machine-readable causes for the failures a screen can trigger. The web API sends these (never the message) and
+ * the client owns the wording (`shared/api/error-copy.ts`), so copy can change without touching services.
+ */
+export const applicationReasons = [
+  "already_exists",
+  "invalid_reference",
+  "rule_violated",
+  "organization_not_found",
+  "person_duplicate_exact",
+  "person_duplicate_strong",
+  "email_taken",
+  "linkedin_taken",
+  "domain_taken",
+  "person_not_found",
+  "person_do_not_contact",
+  "prospect_closed",
+  "contact_archived",
+  "idempotency_key_reused",
+  "outreach_message_not_found",
+  "follow_up_dates_invalid",
+  "route_name_taken",
+  "module_name_taken",
+  "campaign_name_taken",
+  "campaign_not_found",
+  "campaign_needs_route",
+  "campaign_transition_invalid",
+  "campaign_finished",
+  "prospect_outside_campaign_routes",
+  "campaign_not_active",
+  "campaign_window_invalid",
+  "campaign_running",
+  "prospect_not_in_campaign",
+  "follow_up_finished",
+  "interaction_not_found",
+  "route_not_found",
+  "module_not_in_route",
+  "structural_reason_required",
+  "structural_reason_not_applicable",
+  "file_missing",
+  "file_empty",
+  "file_too_large",
+  "file_type_unsupported",
+  "file_content_mismatch",
+  "filename_invalid",
+  "upload_invalid",
+  "storage_unavailable",
+  "cross_origin"
+] as const;
+
+export type ApplicationReason = (typeof applicationReasons)[number];

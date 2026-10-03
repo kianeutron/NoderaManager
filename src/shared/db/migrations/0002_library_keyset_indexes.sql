@@ -1,0 +1,2 @@
+CREATE INDEX "documents_updated_sort_index" ON "documents" USING btree ("updated_at" desc,"id" desc) WHERE "documents"."archived_at" is null;--> statement-breakpoint
+CREATE INDEX "documents_title_sort_index" ON "documents" USING btree (lower("title"),"id") WHERE "documents"."archived_at" is null;
