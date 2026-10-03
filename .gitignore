@@ -7,3 +7,6 @@ test-results/
 .env.local
 .local-blob-store/
 .neon/
+.neon
+.DS_Store
+*.tsbuildinfo
