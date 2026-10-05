@@ -109,8 +109,10 @@ async function planRecord(services: Services, record: BulkOutreachRecord): Promi
 
 export function createBulkOutreachImportService(services: Services) {
   return {
-    async preview(actor: AuthenticatedActor, rawInput: BulkOutreachImportInput) {
-      const input = bulkOutreachImportInputSchema.parse(rawInput);
+    async preview(actor: AuthenticatedActor, input: BulkOutreachImportInput) {
+      // The MCP adapter owns runtime validation and passes the schema's normalized
+      // Dates here. Re-parsing would reject those Dates and would also duplicate
+      // the adapter's boundary validation.
       const fingerprint = fingerprintOf([input]);
       const existing = await services.imports.findForActorByFingerprint?.(actor.id, source, fingerprint);
       if (existing) return { importId: existing.id, expiresAt: existing.expiresAt.toISOString(), plan: existing.plan };
