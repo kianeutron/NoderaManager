@@ -17,7 +17,7 @@ export async function POST(request: Request): Promise<Response> {
   const response = await handler.POST(request);
   if (!new URL(request.url).pathname.endsWith("/oauth2/token") || !response.ok || !response.headers.get("content-type")?.includes("application/json")) return response;
 
-  const body = await response.json() as Record<string, unknown>;
+  const body = await response.clone().json() as Record<string, unknown>;
   if (typeof body.refresh_token !== "string" || body.refresh_token_expires_in !== undefined) return response;
 
   const headers = new Headers(response.headers);
