@@ -1,7 +1,7 @@
 "use client";
 
 import AddRounded from "@mui/icons-material/AddRounded";
-import { Button, Stack, Tab, Tabs } from "@mui/material";
+import { Box, Button, Stack, Tab, Tabs } from "@mui/material";
 import { useState } from "react";
 import { OrganizationFormDialog } from "@/modules/organizations/ui/OrganizationFormDialog";
 import { OrganizationFilterBar } from "@/modules/organizations/ui/OrganizationFilterBar";
@@ -40,13 +40,24 @@ export function PeopleAndCompaniesPage() {
           </PreviewDock>
         )}
       >
-        <Stack sx={{ gap: 3.25 }}>
-          <PageHeader actions={<Button onClick={() => setAdding(true)} startIcon={<AddRounded />} variant="contained">{isPeople ? "Add person" : "Add company"}</Button>} description="Everyone you might reach and the companies they work for." eyebrow="Network" title="People & companies" />
+        <Stack sx={{ gap: 2.5 }}>
+          <PageHeader
+            actions={<Button onClick={() => setAdding(true)} startIcon={<AddRounded />} variant="contained">{isPeople ? "Add person" : "Add company"}</Button>}
+            description="Everyone you might reach and the companies they work for."
+            eyebrow="Network"
+            title="People & companies"
+            toolbar={(
+              <Stack direction={{ xs: "column", md: "row" }} sx={{ alignItems: { md: "center" }, gap: 2 }}>
+                <Tabs aria-label="Network view" onChange={(_event, view: WorkspaceView) => switchView(view)} sx={{ flexShrink: 0 }} value={state.view}>
+                  {workspaceViews.map((view) => <Tab id={`view-${view}`} key={view} label={viewLabel[view]} value={view} />)}
+                </Tabs>
+                <Box sx={{ flex: 1, minWidth: 0 }}>
+                  <SearchField label={isPeople ? "Search people" : "Search companies"} onCommit={(value) => setFilters({ q: value.trim() || undefined }, "replace")} placeholder={isPeople ? "Name, role, email or LinkedIn" : "Company name or domain"} value={state.q ?? ""} />
+                </Box>
+              </Stack>
+            )}
+          />
           <Stack sx={{ gap: 2.5 }}>
-            <Tabs aria-label="Network view" onChange={(_event, view: WorkspaceView) => switchView(view)} value={state.view}>
-              {workspaceViews.map((view) => <Tab id={`view-${view}`} key={view} label={viewLabel[view]} value={view} />)}
-            </Tabs>
-            <SearchField label={isPeople ? "Search people" : "Search companies"} onCommit={(value) => setFilters({ q: value.trim() || undefined }, "replace")} placeholder={isPeople ? "Name, role, email or LinkedIn" : "Company name or domain"} value={state.q ?? ""} />
             <SectionPanel title={viewLabel[state.view]}>
               <Stack sx={{ gap: 2 }}>
                 {isPeople ? <PeopleFilterBar workspace={workspace} /> : <OrganizationFilterBar workspace={workspace} />}

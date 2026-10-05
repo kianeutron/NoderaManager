@@ -21,11 +21,16 @@ export function LibraryPage() {
   const queryClient = useQueryClient();
 
   return (
-    <Stack sx={{ gap: 3.25 }}>
-      <PageHeader actions={<UploadDocumentDialog facets={facets.data} onUploaded={() => void queryClient.invalidateQueries({ queryKey: ["library"] })} />} description="Private files linked to your outreach: proposals, decks, contracts and research." eyebrow="Library" title="Documents" />
+    <Stack sx={{ gap: 2.5 }}>
+      <PageHeader
+        actions={<UploadDocumentDialog facets={facets.data} onUploaded={() => void queryClient.invalidateQueries({ queryKey: ["library"] })} />}
+        description="Private files linked to your outreach: proposals, decks, contracts and research."
+        eyebrow="Library"
+        title="Documents"
+        toolbar={<LibrarySearchField onCommit={(value) => setFilters({ q: value.trim() || undefined }, "replace")} value={filters.q ?? ""} />}
+      />
       <Box sx={{ alignItems: "start", display: "grid", gap: 2.5, gridTemplateColumns: { xs: "minmax(0, 1fr)", lg: documentId ? "minmax(0, 1fr) 380px" : "minmax(0, 1fr)" }, transition: "grid-template-columns 320ms cubic-bezier(.22,1,.36,1)" }}>
         <Stack sx={{ gap: 2.5, minWidth: 0 }}>
-          <LibrarySearchField onCommit={(value) => setFilters({ q: value.trim() || undefined }, "replace")} value={filters.q ?? ""} />
           {hasActiveFilters(filters) ? null : <RecentDocuments onSelect={selectDocument} selectedId={documentId} />}
           <LibrarySection title="All documents">
             <Stack sx={{ gap: 2 }}>

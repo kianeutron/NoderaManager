@@ -37,16 +37,18 @@ export function RoutesAndCampaignsPage() {
           </PreviewDock>
         )}
       >
-        <Stack sx={{ gap: 3.25 }}>
+        <Stack sx={{ gap: 2.5 }}>
           <PageHeader
             actions={<Button onClick={() => setAdding(true)} startIcon={<AddRounded />} variant="contained">{isRoutes ? "Add route" : "Add campaign"}</Button>}
             description="The ways you look for clients, and the campaigns that work them."
             eyebrow="Strategy"
             title="Routes & campaigns"
+            toolbar={(
+              <Tabs aria-label="Strategy view" onChange={(_event, view: StrategyView) => switchView(view)} value={state.view}>
+                {strategyViews.map((view) => <Tab id={`view-${view}`} key={view} label={viewLabel[view]} value={view} />)}
+              </Tabs>
+            )}
           />
-          <Tabs aria-label="Strategy view" onChange={(_event, view: StrategyView) => switchView(view)} value={state.view}>
-            {strategyViews.map((view) => <Tab id={`view-${view}`} key={view} label={viewLabel[view]} value={view} />)}
-          </Tabs>
           {isRoutes ? <RoutesView onScopeChange={(scope) => setFilters({ scope })} onSelect={select} scope={state.scope} selectedId={state.selectedId} /> : <CampaignsView workspace={workspace} />}
         </Stack>
       </PreviewLayout>

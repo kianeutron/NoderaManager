@@ -34,16 +34,18 @@ export function OutreachPage() {
           </PreviewDock>
         )}
       >
-        <Stack sx={{ gap: 3.25 }}>
+        <Stack sx={{ gap: 2.5 }}>
           <PageHeader
             actions={isMessages ? <LogOutreachDialog onSaved={select} /> : <Button onClick={() => setAddingFollowUp(true)} startIcon={<AddRounded />} variant="contained">Add follow-up</Button>}
             description="Messages you have sent, how they landed, and who to get back to."
             eyebrow="Execution"
             title="Outreach"
+            toolbar={(
+              <Tabs aria-label="Outreach view" onChange={(_event, view: OutreachView) => switchView(view)} value={state.view}>
+                {outreachViews.map((view) => <Tab id={`view-${view}`} key={view} label={viewLabel[view]} value={view} />)}
+              </Tabs>
+            )}
           />
-          <Tabs aria-label="Outreach view" onChange={(_event, view: OutreachView) => switchView(view)} value={state.view}>
-            {outreachViews.map((view) => <Tab id={`view-${view}`} key={view} label={viewLabel[view]} value={view} />)}
-          </Tabs>
           {isMessages ? <OutreachMessagesView workspace={workspace} /> : <OutreachFollowUpsView workspace={workspace} />}
         </Stack>
       </PreviewLayout>
