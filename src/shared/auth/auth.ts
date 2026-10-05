@@ -9,7 +9,7 @@ import { jwt } from "better-auth/plugins";
 import { getDashboardAuthEnvironment, getServerEnvironment } from "@/shared/config/server-env";
 import { authDatabase } from "@/shared/auth/auth-database";
 import { isOwnerEmail } from "@/shared/auth/owner-policy";
-import { mcpReadScope, mcpWriteScope } from "@/shared/mcp/mcp-scopes";
+import { mcpOfflineAccessScope, mcpReadScope, mcpWriteScope } from "@/shared/mcp/mcp-scopes";
 
 const environment = getDashboardAuthEnvironment();
 const ownerEmail = getServerEnvironment().OWNER_EMAIL;
@@ -45,7 +45,7 @@ export const auth = betterAuth({
       loginPage: "/auth/sign-in",
       consentPage: "/auth/mcp-consent",
       resource,
-      scopes: [mcpReadScope, mcpWriteScope]
+      scopes: [mcpReadScope, mcpWriteScope, mcpOfflineAccessScope]
     }),
     cimd({
       fetchClientMetadataResource,
