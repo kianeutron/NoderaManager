@@ -36,7 +36,9 @@ export const config = {
   matcher: [
     {
       // Public assets must bypass auth so sign-in can load its own background image.
-      source: "/((?!api|_next/static|_next/image|images|favicon.ico).*)",
+      // MCP transport and protected-resource discovery authenticate themselves with
+      // bearer tokens; dashboard cookie middleware must not intercept either route.
+      source: "/((?!api|_next/static|_next/image|images|mcp|\\.well-known|favicon.ico).*)",
       missing: [
         { type: "header", key: "next-router-prefetch" },
         { type: "header", key: "purpose", value: "prefetch" }
