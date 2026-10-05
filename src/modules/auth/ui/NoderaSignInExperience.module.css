@@ -2,13 +2,12 @@
 .stage { inset: 0; min-height: 100dvh; overflow: hidden; position: absolute; transition: opacity 650ms cubic-bezier(0.22, 1, 0.36, 1), transform 650ms cubic-bezier(0.22, 1, 0.36, 1); }
 .stageVisible { opacity: 1; transform: scale(1); z-index: 2; }
 .stageHidden { opacity: 0; pointer-events: none; transform: scale(1.015); z-index: 1; }
-.backgroundMedia { inset: 0; overflow: hidden; position: absolute; z-index: -3; }
-.backgroundImage { object-fit: cover; object-position: center; }
-.backgroundShade { background: linear-gradient(90deg, rgba(2, 7, 21, 0.05), rgba(2, 7, 21, 0.2) 43%, rgba(2, 7, 21, 0.62)), linear-gradient(0deg, rgba(2, 7, 21, 0.45), transparent 55%); inset: 0; position: absolute; z-index: -2; }
+.signInStage { background: url("/images/auth/nodera-earth-network.png") center / cover no-repeat; }
+.backgroundShade { background: linear-gradient(90deg, rgba(2, 7, 21, 0.05), rgba(2, 7, 21, 0.2) 43%, rgba(2, 7, 21, 0.62)), linear-gradient(0deg, rgba(2, 7, 21, 0.45), transparent 55%); inset: 0; position: absolute; z-index: 0; }
 .welcomeStage { align-items: center; background: radial-gradient(circle at 50% 42%, #152a5c 0%, #08132e 52%, #030816 100%); display: flex; justify-content: center; }
 .welcomeGlass { align-items: center; display: flex; justify-content: center; padding: 24px clamp(28px, 6vw, 96px); }
 .signInStage { align-items: center; display: flex; justify-content: flex-end; padding: clamp(18px, 3vw, 44px); }
-.formGlass { align-items: center; background: linear-gradient(110deg, rgba(11, 24, 58, 0.35), rgba(9, 18, 43, 0.8)); border: 1px solid rgba(158, 186, 255, 0.18); border-radius: 30px; box-shadow: -24px 0 80px rgba(0, 4, 18, 0.24), inset 1px 0 0 rgba(255, 255, 255, 0.08); display: flex; justify-content: center; min-height: min(720px, calc(100dvh - 96px)); padding: clamp(28px, 5vw, 72px); width: min(43vw, 600px); -webkit-backdrop-filter: blur(26px) saturate(125%); backdrop-filter: blur(26px) saturate(125%); }
+.formGlass { align-items: center; background: linear-gradient(110deg, rgba(11, 24, 58, 0.35), rgba(9, 18, 43, 0.8)); border: 1px solid rgba(158, 186, 255, 0.18); border-radius: 30px; box-shadow: -24px 0 80px rgba(0, 4, 18, 0.24), inset 1px 0 0 rgba(255, 255, 255, 0.08); display: flex; justify-content: center; min-height: min(720px, calc(100dvh - 96px)); padding: clamp(28px, 5vw, 72px); position: relative; width: min(43vw, 600px); z-index: 1; -webkit-backdrop-filter: blur(26px) saturate(125%); backdrop-filter: blur(26px) saturate(125%); }
 .formInner { max-width: 380px; width: 100%; }
 .brandLockup { align-items: center; color: #edf3ff; display: inline-flex; font-size: 20px; font-weight: 760; gap: 10px; letter-spacing: -0.04em; }
 .brandMark { display: inline-flex; gap: 2px; transform: rotate(-28deg); }
@@ -23,5 +22,5 @@
 .googleAction :global(.MuiButton-root:hover) { background: #ffffff; box-shadow: none; transform: translateY(-1px); }
 .googleAction :global(.MuiButton-root:focus-visible) { outline: 3px solid #7a9cf6; outline-offset: 3px; }
 .googleAction :global(.MuiButton-startIcon) { margin-right: 10px; }
-@media (max-width: 760px) { .backgroundImage { object-position: 28% center; } .backgroundShade { background: linear-gradient(180deg, rgba(2, 7, 21, 0.2), rgba(2, 7, 21, 0.78) 68%, rgba(2, 7, 21, 0.94)); } .welcomeGlass { padding: 20px; width: calc(100% - 40px); } .signInStage { padding: 14px; } .formGlass { border-radius: 24px; min-height: min(600px, calc(100dvh - 96px)); padding: 32px 26px; width: 100%; } .formCopy { margin: 48px 0 30px; } }
+@media (max-width: 760px) { .signInStage { background-position: 28% center; } .backgroundShade { background: linear-gradient(180deg, rgba(2, 7, 21, 0.2), rgba(2, 7, 21, 0.78) 68%, rgba(2, 7, 21, 0.94)); } .welcomeGlass { padding: 20px; width: calc(100% - 40px); } .signInStage { padding: 14px; } .formGlass { border-radius: 24px; min-height: min(600px, calc(100dvh - 96px)); padding: 32px 26px; width: 100%; } .formCopy { margin: 48px 0 30px; } }
 @media (prefers-reduced-motion: reduce) { .stage, .googleAction :global(.MuiButton-root) { transition: none; } }

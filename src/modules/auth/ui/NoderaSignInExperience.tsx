@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect, useState, type ReactNode } from "react";
 import { StrokeText } from "./StrokeText";
 import styles from "./NoderaSignInExperience.module.css";
@@ -23,9 +22,6 @@ export function NoderaSignInExperience({ signInAction }: NoderaSignInExperienceP
         <div className={styles.welcomeGlass}><StrokeText text="Nodera" /></div>
       </section>
       <section aria-hidden={!showSignIn} aria-live="polite" className={[styles.stage, styles.signInStage, showSignIn ? styles.stageVisible : styles.stageHidden].join(" ")}>
-        <div aria-hidden="true" className={styles.backgroundMedia}>
-          <Image alt="" className={styles.backgroundImage} fill priority sizes="100vw" src="/images/auth/nodera-earth-network.png" />
-        </div>
         <div aria-hidden="true" className={styles.backgroundShade} />
         <div className={styles.formGlass}><SignInContent signInAction={signInAction} /></div>
       </section>
