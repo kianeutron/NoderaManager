@@ -4,7 +4,13 @@ import { Alert, Button, CircularProgress, Container, Paper, Stack, Typography } 
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 
-type ConsentResponse = Readonly<{ redirect_uri?: string }>;
+type ConsentResponse = Readonly<{ redirect?: boolean; url?: string }>;
+
+export function getConsentRedirect(payload: unknown): string | null {
+  if (typeof payload !== "object" || payload === null || Array.isArray(payload)) return null;
+  const response = payload as Partial<ConsentResponse>;
+  return response.redirect === true && typeof response.url === "string" && response.url.length > 0 ? response.url : null;
+}
 
 export function McpConsentForm() {
   const searchParams = useSearchParams();
@@ -20,9 +26,9 @@ export function McpConsentForm() {
         headers: { Accept: "application/json", "Content-Type": "application/json" },
         body: JSON.stringify({ accept, oauth_query: searchParams.toString() })
       });
-      const payload = (await response.json()) as ConsentResponse;
-      if (!response.ok || !payload.redirect_uri) throw new Error("The authorization request could not be completed.");
-      window.location.assign(payload.redirect_uri);
+      const redirect = getConsentRedirect(await response.json());
+      if (!response.ok || !redirect) throw new Error("The authorization request could not be completed.");
+      window.location.assign(redirect);
     } catch {
       setError("The authorization request could not be completed. Please close this window and try again.");
       setSubmitting(false);
