@@ -14,6 +14,8 @@ import { mcpOfflineAccessScope, mcpReadScope, mcpWriteScope } from "@/shared/mcp
 const environment = getDashboardAuthEnvironment();
 const ownerEmail = getServerEnvironment().OWNER_EMAIL;
 const resource = new URL("/mcp", environment.NEXT_PUBLIC_APP_URL).href;
+const mcpRefreshTokenLifetimeSeconds = 60 * 60 * 24 * 365;
+const mcpRefreshTokenReuseIntervalSeconds = 120;
 const googleCredentials = environment.GOOGLE_CLIENT_ID && environment.GOOGLE_CLIENT_SECRET ? {
   clientId: environment.GOOGLE_CLIENT_ID,
   clientSecret: environment.GOOGLE_CLIENT_SECRET,
@@ -46,7 +48,9 @@ export const auth = betterAuth({
       consentPage: "/auth/mcp-consent",
       resource,
       scopes: [mcpReadScope, mcpWriteScope, mcpOfflineAccessScope],
-      clientRegistrationDefaultScopes: [mcpReadScope, mcpWriteScope, mcpOfflineAccessScope]
+      clientRegistrationDefaultScopes: [mcpReadScope, mcpWriteScope, mcpOfflineAccessScope],
+      refreshTokenExpiresIn: mcpRefreshTokenLifetimeSeconds,
+      refreshTokenReuseInterval: mcpRefreshTokenReuseIntervalSeconds
     }),
     cimd({
       fetchClientMetadataResource,
