@@ -66,7 +66,22 @@ async function storageOperation<Result>(operation: string, action: () => Promise
 export function createDocumentBlobStore(): DocumentBlobStore {
   if (!process.env.BLOB_READ_WRITE_TOKEN) {
     if (process.env.NODE_ENV === "development") return createLocalBlobStore();
-    throw new Error("BLOB_READ_WRITE_TOKEN is required outside local development");
+
+    // Keep service construction side-effect free when optional storage is not configured. MCP
+    // discovery builds all application services before it knows which tools will be used; a
+    // missing storage provider must not make unrelated tools undiscoverable. Fail only when a
+    // document operation is actually attempted, through the same sanitized boundary as provider
+    // outages.
+    const unavailable = async (): Promise<never> => {
+      throw new Error("Document storage is not configured");
+    };
+
+    return {
+      open: (blobKey) => storageOperation("open", unavailable),
+      save: (blobKey, body, contentType) => storageOperation("save", unavailable),
+      saveBytes: (blobKey, body, contentType) => storageOperation("save", unavailable),
+      remove: (blobKey) => storageOperation("remove", unavailable)
+    };
   }
 
   const write = (blobKey: string, body: string | ArrayBuffer, contentType: string) => put(blobKey, body, { access: "private", contentType, addRandomSuffix: false, allowOverwrite: false });

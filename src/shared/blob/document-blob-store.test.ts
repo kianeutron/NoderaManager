@@ -35,4 +35,15 @@ describe("remote document blob store", () => {
     vi.mocked(blob.get).mockResolvedValue(null);
     expect(await createDocumentBlobStore().open("documents/a/b")).toBeNull();
   });
+
+  it("does not block service construction when production storage is not configured", async () => {
+    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("BLOB_READ_WRITE_TOKEN", "");
+
+    const store = createDocumentBlobStore();
+    const failure = await store.open("documents/a/b").catch((error: unknown) => error);
+
+    expect(failure).toMatchObject({ code: "unavailable", reason: "storage_unavailable" });
+    expect((failure as Error).message).toBe("File storage is temporarily unavailable.");
+  });
 });
