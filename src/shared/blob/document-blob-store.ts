@@ -3,7 +3,7 @@ import { createReadStream } from "node:fs";
 import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { Readable } from "node:stream";
 import path from "node:path";
-import { del, get, put } from "@vercel/blob";
+import { DeleteObjectCommand, GetObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { ApplicationError } from "@/shared/errors/application-error";
 import { logUnexpectedError } from "@/shared/observability/log-unexpected-error";
 
@@ -17,6 +17,14 @@ export type DocumentBlobStore = Readonly<{
 }>;
 
 const localBlobRoot = path.join(process.cwd(), ".local-blob-store");
+
+type NeonStorageConfig = Readonly<{
+  bucket: string;
+  endpoint: string;
+  region: string;
+  accessKeyId: string;
+  secretAccessKey: string;
+}>;
 
 function localBlobPath(blobKey: string): string {
   if (!/^documents\/[a-zA-Z0-9-]+\/[a-zA-Z0-9-]+$/.test(blobKey)) throw new Error("Invalid blob key");
@@ -63,8 +71,15 @@ async function storageOperation<Result>(operation: string, action: () => Promise
   }
 }
 
+function neonStorageConfig(): NeonStorageConfig | null {
+  const { AWS_ACCESS_KEY_ID: accessKeyId, AWS_SECRET_ACCESS_KEY: secretAccessKey, AWS_ENDPOINT_URL_S3: endpoint, AWS_REGION: region, NEON_STORAGE_BUCKET: bucket } = process.env;
+  if (!accessKeyId || !secretAccessKey || !endpoint || !region || !bucket) return null;
+  return { accessKeyId, secretAccessKey, endpoint, region, bucket };
+}
+
 export function createDocumentBlobStore(): DocumentBlobStore {
-  if (!process.env.BLOB_READ_WRITE_TOKEN) {
+  const config = neonStorageConfig();
+  if (!config) {
     if (process.env.NODE_ENV === "development") return createLocalBlobStore();
 
     // Keep service construction side-effect free when optional storage is not configured. MCP
@@ -84,15 +99,31 @@ export function createDocumentBlobStore(): DocumentBlobStore {
     };
   }
 
-  const write = (blobKey: string, body: string | ArrayBuffer, contentType: string) => put(blobKey, body, { access: "private", contentType, addRandomSuffix: false, allowOverwrite: false });
+  const client = new S3Client({
+    region: config.region,
+    endpoint: config.endpoint,
+    forcePathStyle: true,
+    credentials: { accessKeyId: config.accessKeyId, secretAccessKey: config.secretAccessKey }
+  });
 
   return {
     open: (blobKey) => storageOperation("open", async () => {
-      const result = await get(blobKey, { access: "private" });
-      return result?.statusCode === 200 ? result.stream : null;
+      try {
+        const result = await client.send(new GetObjectCommand({ Bucket: config.bucket, Key: blobKey }));
+        return result.Body?.transformToWebStream() as ReadableStream<Uint8Array> | undefined ?? null;
+      } catch (error) {
+        if (error instanceof Error && "name" in error && (error.name === "NoSuchKey" || error.name === "NotFound")) return null;
+        throw error;
+      }
     }),
-    save: (blobKey, body, contentType) => storageOperation("save", async () => void await write(blobKey, body, contentType)),
-    saveBytes: (blobKey, body, contentType) => storageOperation("save", async () => void await write(blobKey, body, contentType)),
-    remove: (blobKey) => storageOperation("remove", () => del(blobKey))
+    save: (blobKey, body, contentType) => storageOperation("save", async () => {
+      await client.send(new PutObjectCommand({ Bucket: config.bucket, Key: blobKey, Body: body, ContentType: contentType, IfNoneMatch: "*" }));
+    }),
+    saveBytes: (blobKey, body, contentType) => storageOperation("save", async () => {
+      await client.send(new PutObjectCommand({ Bucket: config.bucket, Key: blobKey, Body: new Uint8Array(body), ContentType: contentType, IfNoneMatch: "*" }));
+    }),
+    remove: (blobKey) => storageOperation("remove", async () => {
+      await client.send(new DeleteObjectCommand({ Bucket: config.bucket, Key: blobKey }));
+    })
   };
 }

@@ -29,4 +29,4 @@ Order is `updated_at DESC, id DESC` or `lower(title), id`, each backed by a part
 
 ## Configuration
 
-`BLOB_READ_WRITE_TOKEN` (server-only) must be set for file delivery. Without it the file route fails with a generic 500 and every other route keeps working.
+Neon Object Storage is the private file provider. The server-only `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_ENDPOINT_URL_S3`, `AWS_REGION`, and `NEON_STORAGE_BUCKET` variables must be configured for file delivery. If they are absent, file operations return a generic unavailable error while unrelated routes and MCP tools remain discoverable.
