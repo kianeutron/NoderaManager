@@ -21,6 +21,7 @@ export function createOrganizationsServices({ database }: Readonly<{ database: R
   return {
     findSimilarOrganizations: (input: SimilarOrganizationCheckInput) => findSimilarOrganizations(reads, input),
     searchOrganizations: (query: OrganizationSearchQuery) => searchOrganizations(reads, query),
+    findOrganizationsByDomains: (domains: readonly string[]) => reads.findOrganizationsByDomains(domains),
     getOrganization: (organizationId: string) => getOrganization({ reads, notes }, organizationId),
     createOrganization: (actor: AuthenticatedActor, input: CreateOrganizationInput) => createOrganization({ reads, commands }, actor, input),
     updateOrganization: (actor: AuthenticatedActor, input: UpdateOrganizationInput) => updateOrganization({ reads, commands }, actor, input),

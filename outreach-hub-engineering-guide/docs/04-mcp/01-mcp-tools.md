@@ -35,6 +35,8 @@ Initial write tools:
 - `search_outreach`, `get_outreach_message`
 - `log_interaction` (their replies, calls, meetings, follow-ups we sent; only for what already happened; pass an `idempotencyKey`)
 - `log_bounce` (soft, hard or blocked; repeating it is a no-op)
+- `preview_bulk_outreach_import` (read-only planning for up to 50 historical records; persists an owner-bound import plan but does not mutate CRM records)
+- `commit_bulk_outreach_import` (commits a previewed plan with per-record results, provider-ID idempotency and safe retries)
 - `list_interactions` (a prospect's timeline)
 - `create_followup` (a reason and optional due / not-before dates and suggested channel; pair it with status `dormant` for a timing-only no), `update_followup`, `complete_followup`, `dismiss_followup`
 - `add_note`
@@ -69,3 +71,7 @@ Read tools need `outreach.read`. Every write tool additionally needs `outreach.w
 - **Create tools** run the shared duplicate rules and are idempotent where the docs allow: a repeated `create_prospect`, `create_route`, `create_route_module`, `add_signal` or `add_note` returns the existing record (`created: false`, `auditEventId: null`). `create_person` and `create_organization` block on exact duplicates instead, and name the existing record.
 - **Update tools** change only fields that differ. Omitted means unchanged; `null` clears an optional field. A repeat is a no-op. Free text (notes, qualification text) is named as changed in the audit trail but never copied into it.
 - **Every write** returns `auditEventId` (null when nothing changed).
+
+## Historical bulk import
+
+Bulk import is deliberately two-phase. `preview_bulk_outreach_import` validates and matches domains, email/LinkedIn identities and prospects, then stores the normalized payload and plan server-side for one hour. `commit_bulk_outreach_import` accepts only that preview's `importId`, is bound to the verified MCP client, and processes each record through the existing organization, person, prospect, campaign, outreach, interaction and bounce application services. Provider message/thread identifiers are linked through `external_refs`; deterministic per-record keys plus those references make retries safe. Results include created/reused/skipped/failed record counts and an error for each failed record. A partial batch never causes a failed record to be silently retried as a new message.

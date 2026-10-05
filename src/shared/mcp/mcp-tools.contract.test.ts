@@ -8,6 +8,7 @@ import type { InteractionsServices } from "@/modules/interactions/application/cr
 import type { LibraryServices } from "@/modules/library/application/create-library-services";
 import type { NotesServices } from "@/modules/notes/application/create-notes-services";
 import type { OutreachServices } from "@/modules/outreach/application/create-outreach-services";
+import type { createBulkOutreachImportService } from "@/modules/outreach/application/bulk-outreach-import.service";
 import type { OrganizationsServices } from "@/modules/organizations/application/create-organizations-services";
 import type { PeopleServices } from "@/modules/people/application/create-people-services";
 import type { ProspectsServices } from "@/modules/prospects/application/create-prospects-services";
@@ -24,10 +25,11 @@ const writeToken = ["outreach.read", "outreach.write"];
 const linkRemovalTools = new Set(["unlink_document", "unlink_campaign_prospects"]);
 
 const readTools = [
-  "find_duplicate_candidates", "get_document_metadata", "get_document_text", "get_library_facets", "get_analytics", "get_organization", "get_campaign", "get_overview", "get_performance_breakdown", "get_outreach_message", "get_person", "get_prospect", "get_route_overview",
+  "find_duplicate_candidates", "get_document_metadata", "get_document_text", "get_library_facets", "get_analytics", "get_organization", "get_campaign", "get_overview", "get_performance_breakdown", "get_outreach_message", "get_person", "get_prospect", "get_route_overview", "preview_bulk_outreach_import",
   "list_campaign_prospects", "list_interactions", "list_routes", "search_library", "search_organizations", "search_campaigns", "search_followups", "search_outreach", "search_people", "search_prospects", "suggest_campaign_prospects"
 ];
 const writeTools = [
+  "commit_bulk_outreach_import",
   "add_campaign_prospects", "add_document_version", "add_note", "add_signal", "archive_document", "archive_campaign", "archive_folder", "archive_organization", "archive_person", "archive_route", "archive_route_module", "clear_person_do_not_contact", "complete_followup", "create_campaign", "create_folder", "create_followup", "create_organization", "create_person",
   "create_prospect", "create_route", "create_route_module", "create_text_document", "dismiss_followup", "link_document", "log_bounce", "log_interaction", "log_outreach", "mark_person_do_not_contact", "rename_folder", "restore_campaign", "restore_document", "restore_organization", "restore_person", "restore_route", "restore_route_module",
   "set_campaign_routes", "set_campaign_status", "set_document_tags", "set_organization_domains", "set_person_emails", "set_person_links", "unlink_campaign_prospects", "unlink_document", "update_campaign", "update_document", "update_followup", "update_organization", "update_person", "update_prospect", "update_prospect_status", "update_route", "update_route_module"
@@ -48,6 +50,7 @@ function createContext(overrides: Partial<FakeContext> = {}): FakeContext {
     campaigns: createFakeServices<CampaignsServices>(),
     library: createFakeServices<LibraryServices>(),
     analytics: createFakeServices<AnalyticsServices>(),
+    bulkOutreachImport: createFakeServices<ReturnType<typeof createBulkOutreachImportService>>(),
     ...overrides
   };
 }

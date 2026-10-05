@@ -14,6 +14,8 @@ import { registerNoteTools } from "@/modules/notes/mcp/note-tools";
 import type { OrganizationsServices } from "@/modules/organizations/application/create-organizations-services";
 import { registerOrganizationTools } from "@/modules/organizations/mcp/organization-tools";
 import type { OutreachServices } from "@/modules/outreach/application/create-outreach-services";
+import type { createBulkOutreachImportService } from "@/modules/outreach/application/bulk-outreach-import.service";
+import { registerBulkOutreachImportTools } from "@/modules/outreach/mcp/bulk-import-tools";
 import { registerOutreachTools } from "@/modules/outreach/mcp/outreach-tools";
 import type { PeopleServices } from "@/modules/people/application/create-people-services";
 import { registerPeopleTools } from "@/modules/people/mcp/people-tools";
@@ -29,6 +31,7 @@ export type McpServerContext = Readonly<{
   prospects: ProspectsServices;
   notes: NotesServices;
   outreach: OutreachServices;
+  bulkOutreachImport: ReturnType<typeof createBulkOutreachImportService>;
   interactions: InteractionsServices;
   followUps: FollowUpsServices;
   campaigns: CampaignsServices;
@@ -46,6 +49,7 @@ export function buildMcpServer(context: McpServerContext): McpServer {
   registerProspectTools(server, context.prospects);
   registerNoteTools(server, context.notes);
   registerOutreachTools(server, context.outreach);
+  registerBulkOutreachImportTools(server, context.bulkOutreachImport);
   registerInteractionTools(server, context.interactions);
   registerFollowUpTools(server, context.followUps);
   registerCampaignTools(server, context.campaigns);
