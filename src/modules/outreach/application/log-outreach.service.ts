@@ -29,23 +29,25 @@ const operation = "log_outreach";
  * returns the first message. The same key with different text is refused as misuse.
  */
 export async function logOutreach({ reads, idempotency, prospects, campaigns, commands }: LogOutreachDependencies, actor: AuthenticatedActor, input: LogOutreachInput): Promise<LogOutreachResult> {
-  const target = await prospects.findProspectContact(input.prospectId);
+  const subject = input.subject ?? null;
+
+  // None of these reads depends on another (the prospect and campaign ids come from the input), so one round trip pays for all of them.
+  const [target, earlier, duplicate, membership] = await Promise.all([
+    prospects.findProspectContact(input.prospectId),
+    input.idempotencyKey ? idempotency.find(operation, actor.source, input.idempotencyKey) : null,
+    input.idempotencyKey ? null : reads.findRecentDuplicate({ prospectId: input.prospectId, channel: input.channel, subject, body: input.body }),
+    input.campaignId ? campaigns.findMembership(input.campaignId, input.prospectId) : null
+  ]);
   if (!target) throw new ApplicationError("not_found", "Prospect not found");
 
-  const subject = input.subject ?? null;
   // The send time is left out: a retry without one would otherwise always differ.
   const fingerprint = fingerprintOf([target.prospectId, input.campaignId ?? null, input.channel, subject, input.body]);
 
-  if (input.idempotencyKey) {
-    const earlier = await idempotency.find(operation, actor.source, input.idempotencyKey);
-    if (earlier?.resultEntityId) {
-      if (earlier.fingerprint !== fingerprint) throw new ApplicationError("conflict", "That idempotencyKey was already used for a different message.", "idempotency_key_reused");
-      return { messageId: earlier.resultEntityId, created: false, auditEventId: null, prospectStatus: target.status };
-    }
-  } else {
-    const duplicate = await reads.findRecentDuplicate({ prospectId: target.prospectId, channel: input.channel, subject, body: input.body });
-    if (duplicate) return { messageId: duplicate.id, created: false, auditEventId: null, prospectStatus: target.status };
+  if (earlier?.resultEntityId) {
+    if (earlier.fingerprint !== fingerprint) throw new ApplicationError("conflict", "That idempotencyKey was already used for a different message.", "idempotency_key_reused");
+    return { messageId: earlier.resultEntityId, created: false, auditEventId: null, prospectStatus: target.status };
   }
+  if (duplicate) return { messageId: duplicate.id, created: false, auditEventId: null, prospectStatus: target.status };
 
   assertCanLogOutreach({
     prospect: { status: target.status, archivedAt: target.archivedAt },
@@ -54,7 +56,6 @@ export async function logOutreach({ reads, idempotency, prospects, campaigns, co
   });
 
   if (input.campaignId) {
-    const membership = await campaigns.findMembership(input.campaignId, target.prospectId);
     if (!membership || membership.archivedAt !== null) throw new ApplicationError("not_found", "Campaign not found", "campaign_not_found");
     if (!membership.isMember) throw new ApplicationError("conflict", "The prospect is not part of that campaign.", "prospect_not_in_campaign");
     if (membership.status !== "active") throw new ApplicationError("conflict", "Outreach can only be logged under an active campaign.", "campaign_not_active");

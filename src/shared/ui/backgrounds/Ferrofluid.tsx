@@ -3,6 +3,7 @@
 
 import React, { useEffect, useRef } from 'react';
 import { Renderer, Program, Mesh, Triangle } from 'ogl';
+import { shouldSkipFrame } from '@/shared/ui/backgrounds/frame-gate';
 
 const MAX_COLORS = 8;
 
@@ -224,7 +225,7 @@ const Ferrofluid = ({
     if (!container) return;
 
     const renderer = new Renderer({
-      dpr: dpr ?? (typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1),
+      dpr: dpr ?? 1,
       alpha: true,
       antialias: true
     });
@@ -300,8 +301,11 @@ const Ferrofluid = ({
       canvas.addEventListener('pointermove', onPointerMove);
     }
 
+    let lastDrawnAt = Number.NEGATIVE_INFINITY;
     const loop = t => {
       rafRef.current = requestAnimationFrame(loop);
+      if (shouldSkipFrame(t, lastDrawnAt, 30)) return;
+      lastDrawnAt = t;
       uniforms.iTime.value = t * 0.001;
       if (mouseDampening > 0) {
         if (!lastTimeRef.current) lastTimeRef.current = t;

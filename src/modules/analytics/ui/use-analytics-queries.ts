@@ -2,18 +2,12 @@
 
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import type { InsightsQuery, OverviewRange, PerformanceDimension, PeriodRange } from "@/modules/analytics/domain/analytics.schema";
+import { analyticsKeys } from "@/modules/analytics/ui/analytics-keys";
 import { fetchBreakdown, fetchInsights, fetchOverview } from "@/modules/analytics/ui/analytics-api";
 import { shouldRetryRequest } from "@/shared/api/api-request-error";
 
-export const analyticsKeys = {
-  all: ["analytics"] as const,
-  overview: (range: OverviewRange) => [...analyticsKeys.all, "overview", range] as const,
-  insights: (range: PeriodRange) => [...analyticsKeys.all, "insights", range] as const,
-  breakdown: (range: PeriodRange, by: PerformanceDimension) => [...analyticsKeys.all, "breakdown", range, by] as const
-};
-
-// Figures are always re-read when a page is opened or the window regains focus, so they never lag what was just logged.
-// The previous window stays on screen while the next one loads.
+// Cached for 30 s (the client default), which is safe because every successful write marks these queries stale, so a figure
+// never lags what was just logged. The previous window stays on screen while the next one loads.
 const live = { retry: shouldRetryRequest, placeholderData: keepPreviousData } as const;
 
 export function useOverview(range: OverviewRange) {

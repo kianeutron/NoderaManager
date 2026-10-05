@@ -6,7 +6,7 @@ import { getAnalyticsServices } from "@/modules/analytics/application/analytics-
 import type { AnalyticsServices } from "@/modules/analytics/application/create-analytics-services";
 import { handleApiError } from "@/shared/api/api-error-handler";
 import { requireDashboardOwner } from "@/shared/auth/access-boundary";
-import { getRateLimiter } from "@/shared/rate-limit/rate-limiter";
+import { getMemoryRateLimiter } from "@/shared/rate-limit/memory-rate-limiter";
 import { createFakeServices } from "@/test/fake-services";
 import { createActor } from "@/test/factories/actors";
 
@@ -15,6 +15,7 @@ vi.mock("@/shared/auth/access-boundary", () => ({
   AccessBoundaryError: class extends Error { public constructor(public readonly status: 401 | 403) { super("Access denied"); } }
 }));
 vi.mock("@/shared/rate-limit/rate-limiter", () => ({ getRateLimiter: vi.fn() }));
+vi.mock("@/shared/rate-limit/memory-rate-limiter", () => ({ getMemoryRateLimiter: vi.fn() }));
 vi.mock("@/modules/analytics/application/analytics-services", () => ({ getAnalyticsServices: vi.fn() }));
 
 const app = new Hono().route("/analytics", analyticsRoutes).onError(handleApiError);
@@ -23,7 +24,7 @@ describe("analytics routes", () => {
   beforeEach(() => {
     vi.resetAllMocks();
     vi.mocked(requireDashboardOwner).mockResolvedValue(createActor());
-    vi.mocked(getRateLimiter).mockReturnValue({ enforce: vi.fn() });
+    vi.mocked(getMemoryRateLimiter).mockReturnValue({ enforce: vi.fn() });
   });
 
   it("returns the overview for a range, uncached, and defaults to 30 days", async () => {
@@ -33,7 +34,7 @@ describe("analytics routes", () => {
 
     const response = await app.request("/analytics/overview?range=7d");
     expect(response.status).toBe(200);
-    expect(response.headers.get("cache-control")).toBe("no-store");
+    expect(response.headers.get("cache-control")).toBe("private, no-cache");
     expect(services.getOverview).toHaveBeenCalledWith({ range: "7d" });
 
     await app.request("/analytics/overview");
@@ -56,7 +57,7 @@ describe("analytics routes", () => {
     vi.mocked(getAnalyticsServices).mockReturnValue(services);
 
     const insights = await app.request("/analytics/insights");
-    expect(insights.headers.get("cache-control")).toBe("no-store");
+    expect(insights.headers.get("cache-control")).toBe("private, no-cache");
     expect(services.getInsights).toHaveBeenCalledWith({ range: "90d" });
 
     await app.request("/analytics/breakdown?by=country&range=365d&limit=10");
@@ -75,15 +76,32 @@ describe("analytics routes", () => {
     expect(services.getBreakdown).not.toHaveBeenCalled();
   });
 
-  it("counts every read against the owner's analytics allowance, since each one aggregates a whole window", async () => {
+  it("counts every read against the owner's analytics allowance, since each one aggregates a whole window, without touching the database", async () => {
     const enforce = vi.fn();
-    vi.mocked(getRateLimiter).mockReturnValue({ enforce });
+    vi.mocked(getMemoryRateLimiter).mockReturnValue({ enforce });
     const services = createFakeServices<AnalyticsServices>();
     services.getOverview.mockResolvedValue({} as never);
     vi.mocked(getAnalyticsServices).mockReturnValue(services);
 
     await app.request("/analytics/overview");
     expect(enforce).toHaveBeenCalledWith(expect.any(String), expect.objectContaining({ name: "analytics-read" }));
+  });
+
+  it("answers a repeat request for an unchanged result with a 304 and no body", async () => {
+    const services = createFakeServices<AnalyticsServices>();
+    services.getOverview.mockResolvedValue({ range: "30d", sent: 12 } as never);
+    vi.mocked(getAnalyticsServices).mockReturnValue(services);
+
+    const first = await app.request("/analytics/overview");
+    const validator = first.headers.get("etag");
+    expect(validator).toBeTruthy();
+
+    const repeat = await app.request("/analytics/overview", { headers: { "if-none-match": validator ?? "" } });
+    expect(repeat.status).toBe(304);
+    expect(await repeat.text()).toBe("");
+
+    services.getOverview.mockResolvedValue({ range: "30d", sent: 13 } as never);
+    expect((await app.request("/analytics/overview", { headers: { "if-none-match": validator ?? "" } })).status).toBe(200);
   });
 
   it("is for the owner only", async () => {

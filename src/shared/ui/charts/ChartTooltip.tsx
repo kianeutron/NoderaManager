@@ -9,7 +9,7 @@ export function ChartTooltip({ active, label, payload, formatLabel = String }: C
   if (!active || !payload || payload.length === 0) return null;
 
   return (
-    <Box sx={(theme) => ({ backdropFilter: "blur(14px)", backgroundColor: alpha(theme.palette.background.paper, 0.9), border: `1px solid ${alpha(theme.palette.primary.light, 0.3)}`, borderRadius: 2, boxShadow: `0 12px 30px ${alpha("#000615", 0.4)}`, minWidth: 140, px: 1.5, py: 1 })}>
+    <Box sx={(theme) => ({ backgroundColor: alpha(theme.palette.background.paper, 0.9), border: `1px solid ${alpha(theme.palette.primary.light, 0.3)}`, borderRadius: 2, boxShadow: `0 12px 30px ${alpha("#000615", 0.4)}`, minWidth: 140, px: 1.5, py: 1 })}>
       {label === undefined ? null : <Typography sx={{ fontWeight: 700 }} variant="caption">{formatLabel(String(label))}</Typography>}
       <Stack sx={{ gap: 0.25, mt: label === undefined ? 0 : 0.5 }}>
         {payload.map((entry) => (

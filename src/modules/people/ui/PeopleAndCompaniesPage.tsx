@@ -13,7 +13,6 @@ import { PersonFormDialog } from "@/modules/people/ui/PersonFormDialog";
 import { PersonPreviewPanel } from "@/modules/people/ui/PersonPreviewPanel";
 import { workspaceViews, type WorkspaceView } from "@/modules/people/ui/people-workspace-url-state";
 import { usePeopleWorkspace } from "@/modules/people/ui/use-people-workspace";
-import { AppShell } from "@/shared/ui/AppShell";
 import { PageHeader } from "@/shared/ui/PageHeader";
 import { PreviewDock } from "@/shared/ui/PreviewDock";
 import { PreviewLayout } from "@/shared/ui/PreviewLayout";
@@ -30,7 +29,7 @@ export function PeopleAndCompaniesPage() {
   const closeAdding = () => setAdding(false);
 
   return (
-    <AppShell>
+    <>
       <PreviewLayout
         hasPreview={state.selectedId !== null}
         preview={(
@@ -59,6 +58,6 @@ export function PeopleAndCompaniesPage() {
       </PreviewLayout>
       {adding && isPeople ? <PersonFormDialog onClose={closeAdding} onOpenPerson={(id) => { closeAdding(); openPerson(id); }} onSaved={(id) => { closeAdding(); select(id); }} /> : null}
       {adding && !isPeople ? <OrganizationFormDialog onClose={closeAdding} onOpenOrganization={(id) => { closeAdding(); openOrganization(id); }} onSaved={(id) => { closeAdding(); select(id); }} /> : null}
-    </AppShell>
+    </>
   );
 }

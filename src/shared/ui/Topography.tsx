@@ -2,7 +2,11 @@
 
 import { Mesh, Program, Renderer, Triangle } from "ogl";
 import { useEffect, useMemo, useRef } from "react";
+import { shouldSkipFrame } from "@/shared/ui/backgrounds/frame-gate";
 import styles from "@/shared/ui/Topography.module.css";
+
+// A contour animation does not need the display's full refresh rate.
+const maxFramesPerSecond = 30;
 
 const colorModes = ["elevation", "uniform", "alternating"] as const;
 
@@ -336,7 +340,7 @@ export function Topography({ className, ...props }: TopographyProps) {
     const renderer = new Renderer({
       alpha: true,
       antialias: false,
-      dpr: Math.min(window.devicePixelRatio || 1, 1.5),
+      dpr: 1,
       premultipliedAlpha: true,
       webgl: 2
     });
@@ -436,8 +440,12 @@ export function Topography({ className, ...props }: TopographyProps) {
     };
     const start = () => {
       if (reducedMotion || !isInViewport || !isPageVisible || animationFrame !== 0) return;
+      let lastDrawnAt = Number.NEGATIVE_INFINITY;
       animationFrame = requestAnimationFrame(function frame(time) {
-        render(time);
+        if (!shouldSkipFrame(time, lastDrawnAt, maxFramesPerSecond)) {
+          lastDrawnAt = time;
+          render(time);
+        }
         animationFrame = requestAnimationFrame(frame);
       });
     };

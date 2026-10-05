@@ -11,7 +11,6 @@ import { OutreachMessagesView } from "@/modules/outreach/ui/OutreachMessagesView
 import { OutreachPreviewPanel } from "@/modules/outreach/ui/OutreachPreviewPanel";
 import { outreachViews, type OutreachView } from "@/modules/outreach/ui/outreach-url-state";
 import { useOutreachWorkspace } from "@/modules/outreach/ui/use-outreach-workspace";
-import { AppShell } from "@/shared/ui/AppShell";
 import { PageHeader } from "@/shared/ui/PageHeader";
 import { PreviewDock } from "@/shared/ui/PreviewDock";
 import { PreviewLayout } from "@/shared/ui/PreviewLayout";
@@ -26,7 +25,7 @@ export function OutreachPage() {
   const closePreview = () => select(null);
 
   return (
-    <AppShell>
+    <>
       <PreviewLayout
         hasPreview={state.selectedId !== null}
         preview={(
@@ -49,6 +48,6 @@ export function OutreachPage() {
         </Stack>
       </PreviewLayout>
       {addingFollowUp ? <FollowUpForm onClose={() => setAddingFollowUp(false)} onSaved={(id) => { setAddingFollowUp(false); select(id); }} /> : null}
-    </AppShell>
+    </>
   );
 }

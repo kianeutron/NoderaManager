@@ -11,7 +11,6 @@ import { useStrategyWorkspace } from "@/modules/campaigns/ui/use-strategy-worksp
 import { RouteForm } from "@/modules/routes/ui/RouteForm";
 import { RoutePreviewPanel } from "@/modules/routes/ui/RoutePreviewPanel";
 import { RoutesView } from "@/modules/routes/ui/RoutesView";
-import { AppShell } from "@/shared/ui/AppShell";
 import { PageHeader } from "@/shared/ui/PageHeader";
 import { PreviewDock } from "@/shared/ui/PreviewDock";
 import { PreviewLayout } from "@/shared/ui/PreviewLayout";
@@ -27,7 +26,7 @@ export function RoutesAndCampaignsPage() {
   const closeAdding = () => setAdding(false);
 
   return (
-    <AppShell>
+    <>
       <PreviewLayout
         hasPreview={state.selectedId !== null}
         preview={(
@@ -53,6 +52,6 @@ export function RoutesAndCampaignsPage() {
       </PreviewLayout>
       {adding && isRoutes ? <RouteForm onClose={closeAdding} onSaved={(id) => { closeAdding(); select(id); }} /> : null}
       {adding && !isRoutes ? <CampaignForm onClose={closeAdding} onSaved={(id) => { closeAdding(); select(id); }} /> : null}
-    </AppShell>
+    </>
   );
 }

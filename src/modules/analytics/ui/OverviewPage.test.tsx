@@ -7,7 +7,6 @@ import { ApiRequestError } from "@/shared/api/api-request-error";
 import { renderWithApp } from "@/test/render-with-app";
 
 vi.mock("@/modules/analytics/ui/analytics-api");
-vi.mock("@/shared/ui/AppShell", () => ({ AppShell: ({ children }: { children: React.ReactNode }) => <>{children}</> }));
 vi.mock("@/modules/outreach/ui/LogOutreachDialog", () => ({ LogOutreachDialog: () => <button type="button">Log outreach</button> }));
 
 const navigate = vi.fn();
@@ -25,7 +24,8 @@ describe("OverviewPage", () => {
     renderWithApp(<OverviewPage />);
 
     expect(await screen.findByText("2 follow-ups overdue and 1 message waiting on a reply.")).toBeInTheDocument();
-    for (const title of ["Activity", "Needs you", "Pipeline", "Rhythm", "How deep replies go", "Routes", "Channels", "Campaigns"]) expect(screen.getByRole("heading", { name: title })).toBeInTheDocument();
+    // The charts load after the first paint, so each panel is awaited.
+    for (const title of ["Activity", "Needs you", "Pipeline", "Rhythm", "How deep replies go", "Routes", "Channels", "Campaigns"]) expect(await screen.findByRole("heading", { name: title }, { timeout: 5000 })).toBeInTheDocument();
     expect(screen.getByText("Messages sent")).toBeInTheDocument();
     expect(api.fetchOverview).toHaveBeenCalledWith("30d");
   }, 15_000);

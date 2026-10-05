@@ -1,5 +1,4 @@
-import { NextRequest } from "next/server";
-import { getDashboardAuth } from "@/shared/auth/dashboard-auth";
+import { NextRequest, NextResponse } from "next/server";
 
 function createContentSecurityPolicy(nonce: string): string {
   const isDevelopment = process.env.NODE_ENV === "development";
@@ -26,8 +25,7 @@ export async function proxy(request: NextRequest) {
   requestHeaders.set("Content-Security-Policy", contentSecurityPolicy);
   requestHeaders.set("x-nonce", nonce);
 
-  const authRequest = new NextRequest(request, { headers: requestHeaders });
-  const response = await getDashboardAuth().middleware({ loginUrl: "/auth/sign-in" })(authRequest);
+  const response = NextResponse.next({ request: { headers: requestHeaders } });
   response.headers.set("Content-Security-Policy", contentSecurityPolicy);
   return response;
 }

@@ -1,7 +1,7 @@
 import { Box, Skeleton } from "@mui/material";
 
-/** The shape of a dashboard page while it loads, so nothing jumps when the figures arrive. */
-export function DashboardSkeleton({ label }: Readonly<{ label: string }>) {
+/** The shape of a dashboard page's content (a row of figures and two panels) while it loads, so nothing jumps when it arrives. */
+export function ContentSkeleton({ label }: Readonly<{ label: string }>) {
   return (
     <Box aria-busy="true" aria-label={label} role="status" sx={{ display: "grid", gap: 2 }}>
       <Box sx={{ display: "grid", gap: 2, gridTemplateColumns: { xs: "1fr", sm: "repeat(2, 1fr)", xl: "repeat(4, 1fr)" } }}>

@@ -26,6 +26,7 @@ Before changing code, identify the owning module and existing reusable code. Do 
 - Every data mutation writes an audit event.
 - Duplicate detection happens before creating people and organizations.
 - Every migration must be forward-only, reviewed, and reproducible.
+- Code on a hot path (navigation, lists, aggregates, writes, anything that runs every frame) must stay inside the budgets and rules in `docs/15-performance/`.
 
 ## Required workflow for every task
 

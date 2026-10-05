@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 import "@/app/globals.css";
 import { AppProviders } from "@/shared/ui/AppProviders";
 import { isThemeName, type ThemeName } from "@/shared/ui/theme";
-import { isBackgroundName, type BackgroundName } from "@/shared/ui/backgrounds/background-config";
+import { defaultBackground, isBackgroundName, type BackgroundName } from "@/shared/ui/backgrounds/background-config";
 
 export const metadata: Metadata = {
   title: "Outreach Hub",
@@ -18,7 +18,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   const savedTheme = (await cookies()).get("nodera-theme")?.value;
   const initialTheme: ThemeName = isThemeName(savedTheme) ? savedTheme : "midnight";
   const savedBackground = (await cookies()).get("nodera-background")?.value;
-  const initialBackground: BackgroundName = isBackgroundName(savedBackground) ? savedBackground : "topography";
+  const initialBackground: BackgroundName = isBackgroundName(savedBackground) ? savedBackground : defaultBackground;
 
   return (
     <html lang="en">

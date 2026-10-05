@@ -1,5 +1,6 @@
 import { MutationCache, QueryCache, QueryClient } from "@tanstack/react-query";
 import { isSessionExpired } from "@/shared/api/error-copy";
+import { liveFiguresKey } from "@/shared/api/live-figures";
 
 const signInPath = "/auth/sign-in";
 
@@ -11,9 +12,11 @@ function leaveIfSessionExpired(error: unknown): void {
 }
 
 export function createQueryClient(): QueryClient {
-  return new QueryClient({
+  const queryClient: QueryClient = new QueryClient({
     queryCache: new QueryCache({ onError: leaveIfSessionExpired }),
-    mutationCache: new MutationCache({ onError: leaveIfSessionExpired }),
+    // Any write can change the overview and analytics, so they are marked stale after each one and refetch when next shown.
+    mutationCache: new MutationCache({ onError: leaveIfSessionExpired, onSuccess: () => { void queryClient.invalidateQueries({ queryKey: liveFiguresKey }); } }),
     defaultOptions: { queries: { staleTime: 30_000, refetchOnWindowFocus: false } }
   });
+  return queryClient;
 }

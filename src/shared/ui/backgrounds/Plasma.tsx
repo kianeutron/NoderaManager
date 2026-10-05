@@ -3,6 +3,7 @@
 
 import { useEffect, useRef } from 'react';
 import { Renderer, Program, Mesh, Triangle } from 'ogl';
+import { shouldSkipFrame } from '@/shared/ui/backgrounds/frame-gate';
 
 const hexToRgb = hex => {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -222,7 +223,6 @@ export const Plasma = ({
     let isVisible = true;
     let tabVisible = document.visibilityState !== 'hidden';
     const t0 = performance.now();
-    const frameInterval = 1000 / targetFps;
     let lastFrameTime = 0;
 
     const renderStaticFrame = () => {
@@ -233,7 +233,7 @@ export const Plasma = ({
     const loop = t => {
       if (contextLost || !isVisible || !tabVisible) return;
 
-      if (t - lastFrameTime < frameInterval) {
+      if (shouldSkipFrame(t, lastFrameTime, targetFps)) {
         raf = requestAnimationFrame(loop);
         return;
       }

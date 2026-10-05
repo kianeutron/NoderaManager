@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useCallback, useContext, useMemo, useSyncExternalStore, type ReactNode } from "react";
-import { backgroundNames, type BackgroundName, isBackgroundName } from "@/shared/ui/backgrounds/background-config";
+import { backgroundNames, defaultBackground, type BackgroundName, isBackgroundName } from "@/shared/ui/backgrounds/background-config";
 
 export { backgroundNames, isBackgroundName, type BackgroundName } from "@/shared/ui/backgrounds/background-config";
 
@@ -9,9 +9,9 @@ const storageKey = "nodera-background";
 const cookieKey = "nodera-background";
 
 type BackgroundContextValue = Readonly<{ backgroundName: BackgroundName; setBackgroundName: (name: BackgroundName) => void }>;
-const BackgroundContext = createContext<BackgroundContextValue>({ backgroundName: "topography", setBackgroundName: () => undefined });
+const BackgroundContext = createContext<BackgroundContextValue>({ backgroundName: defaultBackground, setBackgroundName: () => undefined });
 
-export function BackgroundSelectionProvider({ children, initialBackground = "topography" }: Readonly<{ children: ReactNode; initialBackground?: BackgroundName }>) {
+export function BackgroundSelectionProvider({ children, initialBackground = defaultBackground }: Readonly<{ children: ReactNode; initialBackground?: BackgroundName }>) {
   const subscribe = useCallback((onStoreChange: () => void) => {
     window.addEventListener("storage", onStoreChange);
     window.addEventListener("nodera-background-changed", onStoreChange);
@@ -19,7 +19,7 @@ export function BackgroundSelectionProvider({ children, initialBackground = "top
   }, []);
   const getSnapshot = useCallback((): BackgroundName => {
     const saved = window.localStorage.getItem(storageKey);
-    return isBackgroundName(saved) ? saved : "topography";
+    return isBackgroundName(saved) ? saved : defaultBackground;
   }, []);
   const backgroundName = useSyncExternalStore(subscribe, getSnapshot, () => initialBackground);
   const value = useMemo<BackgroundContextValue>(() => ({

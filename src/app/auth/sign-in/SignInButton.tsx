@@ -2,11 +2,9 @@
 
 import Google from "@mui/icons-material/Google";
 import { Alert, Button, Stack } from "@mui/material";
-import { createAuthClient } from "@neondatabase/neon-js/auth/next";
 import { useState } from "react";
 import { signInUnavailableMessage } from "@/modules/auth/ui/sign-in-errors";
-
-const authClient = createAuthClient();
+import { authClient } from "@/shared/auth/auth-client";
 
 type SignInButtonProps = Readonly<{
   /** A failure from an earlier attempt, passed back through the URL. */

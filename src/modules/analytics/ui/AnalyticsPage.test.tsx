@@ -7,7 +7,6 @@ import { breakdownFixture, insightsFixture } from "@/test/factories/insights";
 import { renderWithApp } from "@/test/render-with-app";
 
 vi.mock("@/modules/analytics/ui/analytics-api");
-vi.mock("@/shared/ui/AppShell", () => ({ AppShell: ({ children }: { children: React.ReactNode }) => <>{children}</> }));
 
 const navigate = vi.fn();
 let search = "";
@@ -24,8 +23,9 @@ describe("AnalyticsPage", () => {
   it("shows every section over the default 90-day window", async () => {
     renderWithApp(<AnalyticsPage />);
 
-    expect(await screen.findByRole("heading", { name: "Activity" })).toBeInTheDocument();
-    for (const title of ["Activity", "Conversion funnel", "Reply time", "Performance breakdown", "Best time to send", "Deliverability"]) expect(screen.getByRole("heading", { name: title })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Activity" }, { timeout: 5000 })).toBeInTheDocument();
+    // The charts load after the first paint, so each panel is awaited.
+    for (const title of ["Activity", "Conversion funnel", "Reply time", "Performance breakdown", "Best time to send", "Deliverability"]) expect(await screen.findByRole("heading", { name: title }, { timeout: 5000 })).toBeInTheDocument();
     expect(api.fetchInsights).toHaveBeenCalledWith("90d");
     expect(await screen.findByText("Agency Overflow")).toBeInTheDocument();
   }, 15_000);
@@ -33,7 +33,7 @@ describe("AnalyticsPage", () => {
   it("reads the window and the split from the URL, and rewrites it without adding history", async () => {
     search = "range=365d&by=persona";
     renderWithApp(<AnalyticsPage />);
-    await screen.findByRole("heading", { name: "Activity" });
+    await screen.findByRole("heading", { name: "Activity" }, { timeout: 5000 });
 
     expect(api.fetchInsights).toHaveBeenCalledWith("365d");
     expect(api.fetchBreakdown).toHaveBeenCalledWith("365d", "persona");
@@ -55,6 +55,6 @@ describe("AnalyticsPage", () => {
 
     vi.mocked(api.fetchInsights).mockResolvedValue(insightsFixture());
     fireEvent.click(screen.getByRole("button", { name: "Try again" }));
-    await waitFor(() => expect(screen.getByRole("heading", { name: "Activity" })).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByRole("heading", { name: "Activity" })).toBeInTheDocument(), { timeout: 5000 });
   }, 20_000);
 });

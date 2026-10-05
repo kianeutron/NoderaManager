@@ -1,23 +1,12 @@
-import { getMcpAuthorizationConfiguration, getMcpResourceUrl } from "@/shared/mcp/mcp-authentication";
-import { mcpReadScope, mcpWriteScope } from "@/shared/mcp/mcp-scopes";
+import { auth } from "@/shared/auth/auth";
 
 export const dynamic = "force-dynamic";
 
-export async function GET(): Promise<Response> {
-  const configuration = getMcpAuthorizationConfiguration();
-  if (!configuration) return new Response(null, { status: 404, headers: { "Cache-Control": "no-store" } });
-
-  const metadata = {
-    resource: getMcpResourceUrl(configuration).href,
-    authorization_servers: [configuration.MCP_AUTHORIZATION_SERVER],
-    scopes_supported: [mcpReadScope, mcpWriteScope],
-    resource_name: "Outreach Hub"
-  };
-
-  return Response.json(metadata, {
-    headers: {
-      "Access-Control-Allow-Origin": "*",
-      "Cache-Control": "no-store"
-    }
-  });
+export async function GET(request: Request): Promise<Response> {
+  const url = new URL(request.url);
+  url.pathname = "/.well-known/oauth-protected-resource/mcp";
+  const response = await auth.handler(new Request(url, request));
+  response.headers.set("Access-Control-Allow-Origin", "*");
+  response.headers.set("Cache-Control", "no-store");
+  return response;
 }

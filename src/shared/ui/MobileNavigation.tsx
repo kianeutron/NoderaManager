@@ -6,6 +6,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { BackgroundSelector } from "@/shared/ui/BackgroundSelector";
+import { blurredBackdrop } from "@/shared/ui/glass";
 import { ThemeSelector } from "@/shared/ui/ThemeSelector";
 import { isActiveRoute, navigationItems } from "@/shared/ui/navigation-config";
 
@@ -17,7 +18,7 @@ export function MobileNavigation() {
   const pathname = usePathname();
   const [anchor, setAnchor] = useState<HTMLElement | null>(null);
   const moreActive = secondaryItems.some((item) => isActiveRoute(pathname, item.href));
-  return <Paper component="nav" elevation={0} sx={{ backdropFilter: "blur(22px) saturate(145%)", backgroundColor: "rgba(9, 16, 40, 0.78)", border: 1, borderColor: "divider", borderRadius: 4, bottom: "max(0.85rem, env(safe-area-inset-bottom))", display: { md: "none", xs: "flex" }, left: "50%", p: 0.75, position: "fixed", transform: "translateX(-50%)", width: "min(calc(100% - 1.5rem), 31rem)", zIndex: (theme) => theme.zIndex.drawer + 2 }}>
+  return <Paper component="nav" elevation={0} sx={{ ...blurredBackdrop, backgroundColor: "rgba(9, 16, 40, 0.86)", border: 1, borderColor: "divider", borderRadius: 4, bottom: "max(0.85rem, env(safe-area-inset-bottom))", display: { md: "none", xs: "flex" }, left: "50%", p: 0.75, position: "fixed", transform: "translateX(-50%)", width: "min(calc(100% - 1.5rem), 31rem)", zIndex: (theme) => theme.zIndex.drawer + 2 }}>
     <Stack direction="row" sx={{ alignItems: "center", justifyContent: "space-around", width: "100%" }}>
       {primaryItems.map((item) => {
         const active = isActiveRoute(pathname, item.href);

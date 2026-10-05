@@ -4,7 +4,7 @@ import { SignInButton } from "@/app/auth/sign-in/SignInButton";
 import { renderWithTheme } from "@/test/render-with-theme";
 
 const { social } = vi.hoisted(() => ({ social: vi.fn() }));
-vi.mock("@neondatabase/neon-js/auth/next", () => ({ createAuthClient: () => ({ signIn: { social } }) }));
+vi.mock("@/shared/auth/auth-client", () => ({ authClient: { signIn: { social } } }));
 
 describe("SignInButton", () => {
   beforeEach(() => {

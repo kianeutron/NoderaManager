@@ -15,14 +15,14 @@ type OverviewHeroProps = Readonly<{
   overview: Pick<Overview, "followUps" | "awaitingReply" | "totals" | "days"> | undefined;
   range: OverviewRange;
   onRangeChange: (range: OverviewRange) => void;
-  onLogged: () => void;
   now: Date;
 }>;
 
 /** The page's first line: what needs doing today, the window everything below is measured over, and the one thing you do most. */
-export function OverviewHero({ overview, range, onRangeChange, onLogged, now }: OverviewHeroProps) {
+export function OverviewHero({ overview, range, onRangeChange, now }: OverviewHeroProps) {
   return (
     <GlassPanel
+      blur
       highlight
       sx={(theme) => ({
         p: { xs: 2.5, md: 3.5 },
@@ -42,7 +42,8 @@ export function OverviewHero({ overview, range, onRangeChange, onLogged, now }: 
         </Box>
         <Stack sx={{ alignItems: { xs: "stretch", md: "flex-end" }, gap: 1.5 }}>
           <RangeToggle label="Time window" labels={rangeLabel} onChange={onRangeChange} options={overviewRangeValues} value={range} />
-          <LogOutreachDialog onSaved={onLogged} />
+          {/* Logging a message marks the figures stale, so they refresh without any help from here. */}
+          <LogOutreachDialog onSaved={() => undefined} />
         </Stack>
       </Stack>
     </GlassPanel>

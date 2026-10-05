@@ -8,6 +8,7 @@ import { alpha, styled } from "@mui/material/styles";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, type ReactNode } from "react";
+import { blurredBackdrop } from "@/shared/ui/glass";
 import { ThemeSelector } from "@/shared/ui/ThemeSelector";
 import { BackgroundSelector } from "@/shared/ui/BackgroundSelector";
 import { MobileNavigation } from "@/shared/ui/MobileNavigation";
@@ -87,11 +88,10 @@ export function AppShell({ children }: AppShellProps) {
     <Box sx={{ display: "flex", isolation: "isolate", minHeight: "100vh", position: "relative" }}>
       <Box component="nav" sx={{ display: { xs: "none", md: "block" }, flexShrink: 0, position: "relative", width: collapsed ? collapsedDrawerWidth : drawerWidth, zIndex: 1, transition: "width 220ms cubic-bezier(.22,1,.36,1)" }}>
         <Drawer slotProps={{ paper: { sx: (theme) => ({
-          backdropFilter: "blur(20px) saturate(145%)",
           background: `linear-gradient(165deg, ${alpha(theme.palette.background.paper, 0.58)}, ${alpha(theme.palette.background.default, 0.68)}), linear-gradient(120deg, ${alpha(theme.palette.common.black, 0.18)}, transparent 58%)`,
           borderRightColor: alpha(theme.palette.primary.light, 0.2),
           boxShadow: `inset -1px 0 0 ${alpha(theme.palette.common.white, 0.045)}, 16px 0 42px ${alpha("#000615", 0.18)}`,
-          WebkitBackdropFilter: "blur(20px) saturate(145%)",
+          ...blurredBackdrop,
           width: collapsed ? collapsedDrawerWidth : drawerWidth,
           transition: "width 220ms cubic-bezier(.22,1,.36,1)"
         }) } }} variant="permanent">

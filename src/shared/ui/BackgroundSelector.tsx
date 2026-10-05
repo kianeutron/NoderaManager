@@ -6,6 +6,7 @@ import { useState } from "react";
 import { backgroundNames, useBackgroundSelection, type BackgroundName } from "@/shared/ui/backgrounds/background-context";
 
 const labels: Record<BackgroundName, { label: string; description: string }> = {
+  still: { label: "Still", description: "No animation, fastest" },
   topography: { label: "Topography", description: "Quiet flowing contours" },
   ferrofluid: { label: "Ferrofluid", description: "Liquid metallic motion" },
   plasma: { label: "Plasma", description: "Soft atmospheric energy" }

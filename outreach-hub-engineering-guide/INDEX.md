@@ -1,6 +1,6 @@
 # Documentation Index
 
-Total Markdown files: 91
+Total Markdown files: 99
 
 - [AGENTS.md](AGENTS.md)
 - [PROMPT_FOR_GPT_WORK.md](PROMPT_FOR_GPT_WORK.md)
@@ -104,3 +104,11 @@ Total Markdown files: 91
 - [docs/14-reference/02-example-api-route.md](docs/14-reference/02-example-api-route.md)
 - [docs/14-reference/03-example-component.md](docs/14-reference/03-example-component.md)
 - [docs/14-reference/04-source-references.md](docs/14-reference/04-source-references.md)
+- [docs/15-performance/00-overview-and-budgets.md](docs/15-performance/00-overview-and-budgets.md)
+- [docs/15-performance/01-audit-findings.md](docs/15-performance/01-audit-findings.md)
+- [docs/15-performance/02-infrastructure-and-network.md](docs/15-performance/02-infrastructure-and-network.md)
+- [docs/15-performance/03-database.md](docs/15-performance/03-database.md)
+- [docs/15-performance/04-server-and-api.md](docs/15-performance/04-server-and-api.md)
+- [docs/15-performance/05-client-and-rendering.md](docs/15-performance/05-client-and-rendering.md)
+- [docs/15-performance/06-measurement-and-monitoring.md](docs/15-performance/06-measurement-and-monitoring.md)
+- [docs/15-performance/07-checklists.md](docs/15-performance/07-checklists.md)
