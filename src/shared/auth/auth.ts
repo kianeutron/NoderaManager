@@ -45,7 +45,8 @@ export const auth = betterAuth({
       loginPage: "/auth/sign-in",
       consentPage: "/auth/mcp-consent",
       resource,
-      scopes: [mcpReadScope, mcpWriteScope, mcpOfflineAccessScope]
+      scopes: [mcpReadScope, mcpWriteScope, mcpOfflineAccessScope],
+      clientRegistrationDefaultScopes: [mcpReadScope, mcpWriteScope, mcpOfflineAccessScope]
     }),
     cimd({
       fetchClientMetadataResource,
