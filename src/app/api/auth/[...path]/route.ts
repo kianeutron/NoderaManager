@@ -1,12 +1,17 @@
 import { toNextJsHandler } from "better-auth/next-js";
-import { auth } from "@/shared/auth/auth";
+import { auth, mcpResource } from "@/shared/auth/auth";
+import { withChatGptMcpScopes } from "@/shared/auth/mcp-oauth-request";
 
 const handler = toNextJsHandler(auth);
 const mcpRefreshTokenLifetimeSeconds = 60 * 60 * 24 * 365;
 
 export const dynamic = "force-dynamic";
 
-export const { GET, PUT, PATCH, DELETE } = handler;
+export async function GET(request: Request): Promise<Response> {
+  return handler.GET(withChatGptMcpScopes(request, mcpResource));
+}
+
+export const { PUT, PATCH, DELETE } = handler;
 
 /**
  * ChatGPT can renew a remote MCP connection without prompting when the token
