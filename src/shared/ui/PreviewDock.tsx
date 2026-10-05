@@ -16,11 +16,11 @@ type PreviewDockProps = Readonly<{
 const enter = { "@keyframes previewEnter": { from: { opacity: 0, transform: "translateX(14px)" }, to: { opacity: 1, transform: "translateX(0)" } }, "@media (prefers-reduced-motion: no-preference)": { animation: "previewEnter 240ms cubic-bezier(.22,1,.36,1) both" } } as const;
 
 /**
- * Wide screens keep the preview beside the list; narrower ones slide it over as a drawer. Either way the container is a flex
+ * Desktop and tablet layouts keep the preview beside the list; phones slide it over as a drawer. Either way the container is a flex
  * column that never outgrows the viewport, and the `PreviewFrame` inside owns the scrolling (header and footer stay put).
  */
 export function PreviewDock({ selectedId, onClose, label, children }: PreviewDockProps) {
-  const isWide = useMediaQuery(useTheme().breakpoints.up("xl"));
+  const isWide = useMediaQuery(useTheme().breakpoints.up("lg"));
 
   if (isWide) {
     if (!selectedId) return null;
