@@ -97,14 +97,23 @@ async function planRecord(services: Services, record: BulkOutreachRecord): Promi
   }
 
   if (!prospectId) {
-    const page = await services.prospects.searchProspects({ routeId: record.routeId, ...(record.routeModuleId ? { routeModuleId: record.routeModuleId } : {}), ...(personId ? { personId } : {}), ...(organizationId ? { organizationId } : {}), sort: "updated", limit: 2 });
-    const existing = page.items[0];
+    // A prospect is a target, not a route/module membership. If either supplied
+    // identity still needs creation (or failed validation), route-only matching
+    // could reuse an unrelated person's prospect.
+    const targetReady = errors.length === 0 && (!record.person || Boolean(personId)) && (!record.organization || Boolean(organizationId));
+    const existing = targetReady ? await findReusableProspect(services, record, personId, organizationId) : null;
     if (existing) { prospectId = existing.id; prospectAction = "reuse"; }
     else prospectAction = "create";
   } else if (!(await services.prospects.getProspect(prospectId))) errors.push("Prospect not found.");
 
   if (record.campaignId && !(await services.campaigns.getCampaign(record.campaignId))) errors.push("Campaign not found.");
   return { recordKey: record.recordKey, organizationId, personId, prospectId, organizationAction, personAction, prospectAction, messageCount: record.messages.length, interactionCount: record.interactions.length, errors };
+}
+
+async function findReusableProspect(services: Services, record: BulkOutreachRecord, personId: string | null, organizationId: string | null) {
+  if (!personId && !organizationId) return null;
+  const page = await services.prospects.searchProspects({ routeId: record.routeId, ...(record.routeModuleId ? { routeModuleId: record.routeModuleId } : {}), ...(personId ? { personId } : {}), ...(organizationId ? { organizationId } : {}), sort: "updated", limit: 2 });
+  return page.items[0] ?? null;
 }
 
 export function createBulkOutreachImportService(services: Services) {
@@ -163,8 +172,7 @@ async function commitRecord(services: Services, actor: AuthenticatedActor, impor
   }
   let prospectId = record.prospectId;
   if (!prospectId) {
-    const page = await services.prospects.searchProspects({ routeId: record.routeId, ...(record.routeModuleId ? { routeModuleId: record.routeModuleId } : {}), ...(personId ? { personId } : {}), ...(organizationId ? { organizationId } : {}), sort: "updated", limit: 2 });
-    prospectId = page.items[0]?.id;
+    prospectId = (await findReusableProspect(services, record, personId ?? null, organizationId ?? null))?.id;
     if (!prospectId) prospectId = (await services.prospects.createProspect(actor, { personId, organizationId, routeId: record.routeId, ...(record.routeModuleId ? { routeModuleId: record.routeModuleId } : {}), status: "researched", source: "import" })).prospectId;
   }
   if (!prospectId) throw new ApplicationError("conflict", "The record has no usable prospect target.");
