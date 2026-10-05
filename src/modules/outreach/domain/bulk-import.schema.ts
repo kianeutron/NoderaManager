@@ -9,6 +9,10 @@ import { displayNameSchema, isoTimestampSchema, optionalTextSchema } from "@/sha
 const channelSchema = z.enum(outreachChannelValues);
 const sourceSchema = z.enum(externalSourceValues);
 const refTypeSchema = z.enum(externalRefTypeValues);
+// MCP SDKs may validate the tool schema before invoking the application service.
+// That first pass transforms ISO strings into Dates, so the service boundary must
+// also accept the already-normalized value when it validates again.
+const importTimestampSchema = z.union([isoTimestampSchema, z.date()]);
 
 const organizationSchema = createOrganizationInputSchema.extend({}).strict();
 const personSchema = z.strictObject({
@@ -31,7 +35,7 @@ const messageSchema = z.strictObject({
   channel: channelSchema,
   subject: optionalTextSchema(300).optional(),
   body: z.string().trim().min(1).max(maxOutreachBodyLength),
-  sentAt: isoTimestampSchema,
+  sentAt: importTimestampSchema,
   external: externalIdentitySchema.optional(),
   bounceStatus: z.enum(["soft", "hard", "blocked"]).optional()
 });
@@ -43,7 +47,7 @@ const interactionSchema = z.strictObject({
   channel: channelSchema,
   subject: optionalTextSchema(300).optional(),
   body: z.string().trim().min(1).max(maxInteractionBodyLength).optional(),
-  occurredAt: isoTimestampSchema,
+  occurredAt: importTimestampSchema,
   responseDepth: z.number().int().min(1).max(9).optional(),
   sentiment: z.enum(sentimentValues).optional(),
   answersMessageKey: z.string().trim().min(1).max(160).optional(),

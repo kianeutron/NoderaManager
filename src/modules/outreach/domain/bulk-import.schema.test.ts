@@ -18,6 +18,19 @@ describe("bulk outreach import schema", () => {
     expect(result.records[0]?.interactions[0]?.body).toBe("Yes");
   });
 
+  it("accepts the already-normalized dates passed by the MCP adapter", () => {
+    const parsed = bulkOutreachImportInputSchema.parse({ records: [{
+      recordKey: "thread-2",
+      organization: { name: "Acme", domains: ["acme.io"] },
+      person: { fullName: "Marta Chen", emails: ["marta@acme.io"] },
+      routeId,
+      messages: [{ key: "sent-1", channel: "email", body: "Hello", sentAt: "2026-09-01T10:00:00Z" }]
+    }] });
+
+    const reparsed = bulkOutreachImportInputSchema.parse(parsed);
+    expect(reparsed.records[0]?.messages[0]?.sentAt).toEqual(new Date("2026-09-01T10:00:00Z"));
+  });
+
   it("rejects duplicate record and message keys", () => {
     const result = bulkOutreachImportInputSchema.safeParse({ records: [
       { recordKey: "same", routeId, messages: [{ key: "same", channel: "email", body: "x", sentAt: "2026-09-01T10:00:00Z" }] },
