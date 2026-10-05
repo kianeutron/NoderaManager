@@ -16,6 +16,9 @@ import { toAuditEvent } from "@/shared/audit/audit-actor";
 
 const previewLifetimeMilliseconds = 60 * 60 * 1000;
 const source = "mcp";
+// Changing matching rules must invalidate previously persisted plans for the
+// same payload; retries within this version remain idempotent.
+const bulkImportPlanVersion = "target-match-v2";
 
 type Services = Readonly<{
   people: Pick<PeopleServices, "getPerson" | "findDuplicateCandidates" | "createPerson">;
@@ -122,7 +125,7 @@ export function createBulkOutreachImportService(services: Services) {
       // The MCP adapter owns runtime validation and passes the schema's normalized
       // Dates here. Re-parsing would reject those Dates and would also duplicate
       // the adapter's boundary validation.
-      const fingerprint = fingerprintOf([input]);
+      const fingerprint = fingerprintOf([bulkImportPlanVersion, input]);
       const existing = await services.imports.findForActorByFingerprint?.(actor.id, source, fingerprint);
       if (existing) return { importId: existing.id, expiresAt: existing.expiresAt.toISOString(), plan: existing.plan };
       const records = await Promise.all(input.records.map(async (record) => {
