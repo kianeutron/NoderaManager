@@ -4,21 +4,19 @@ import type { ReactNode } from "react";
 type PageHeaderProps = Readonly<{
   eyebrow?: string;
   title: string;
+  /** Kept for page-level compatibility; the compact header intentionally omits supporting copy. */
   description: string;
   actions?: ReactNode;
 }>;
 
-export function PageHeader({ eyebrow, title, description, actions }: PageHeaderProps) {
+export function PageHeader({ eyebrow, title, actions }: PageHeaderProps) {
   return (
-    <Stack direction={{ xs: "column", md: "row" }} sx={{ gap: 2.5, justifyContent: "space-between" }}>
-      <Box>
+    <Stack direction={{ xs: "column", md: "row" }} sx={{ alignItems: { md: "center" }, gap: { xs: 1.5, md: 2 }, justifyContent: "space-between" }}>
+      <Box sx={{ minWidth: 0 }}>
         {eyebrow ? <Typography color="primary.light" variant="overline">{eyebrow}</Typography> : null}
-        <Typography component="h1" variant="h4">{title}</Typography>
-        <Typography color="text.secondary" sx={{ mt: 0.75, maxWidth: 680 }}>
-          {description}
-        </Typography>
+        <Typography component="h1" sx={{ lineHeight: 1.12 }} variant="h4">{title}</Typography>
       </Box>
-      {actions ? <Stack sx={{ alignItems: { md: "flex-end" }, justifyContent: "center" }}>{actions}</Stack> : null}
+      {actions ? <Stack sx={{ alignItems: { xs: "stretch", md: "flex-end" }, flexShrink: 0, justifyContent: "center" }}>{actions}</Stack> : null}
     </Stack>
   );
 }
